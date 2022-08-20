@@ -1,12 +1,28 @@
+require('dotenv').config();
 import express from 'express';
+import jwt from 'jsonwebtoken';
+import cookie from 'cookie';
 import Database from '../config/db.config';
 import logger from './winston';
-require('dotenv').config();
 
 function isAccessible(req: express.Request, res: express.Response, next: express.NextFunction) {
     const isConnected = Database.isSuccess();
 
     if (isConnected) {
+        if (req.headers.cookie !== undefined) {
+            const cookies = cookie.parse(req.headers.cookie);
+            try {
+                const parsedCookie: any = jwt.verify(cookies.LOGIN_ACCESS_COOKIE, process.env.JSON_PRIVATE_KEY as string);
+
+                req.userEmail = parsedCookie.email;
+            } catch (err: any) {
+                res.status(401).send({ message: 'User needs to login' });
+            }
+        } else {
+            res.status(401).send({ message: 'User needs to login' });
+            return;
+        }
+
         if (req.headers.authorization !== undefined) {
             if (req.headers.authorization === process.env.AUTHORIZATION_CODE) {
                 req.isAccessible = true;

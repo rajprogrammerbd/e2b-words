@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\@types",
+    "\\src\\@types\\express",
+    "\\src\\config",
+    "\\src\\config\\schema",
+    "\\src\\controllers",
+    "\\src\\middlewares",
+    "\\src\\utils"
+  ],
+  "SelectedNode": "\\index.ts",
+  "PreviewInSolutionExplorer": false
+}
