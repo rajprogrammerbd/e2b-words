@@ -17,6 +17,7 @@ Database.connect().then(() => {
 
 // Importing routes
 import homepageRoutes from './src/routes/homepage.route';
+import wordsRoute from './src/routes/words.route';
 
 // Import middlewares
 import isAccessible from './src/middlewares/isAccessible';
@@ -43,6 +44,7 @@ app.use(
 app.use(isAccessible);
 
 app.use('/', homepageRoutes);
+app.use('/api', wordsRoute);
 
 const PORT = process.env.PORT || 5003;
 const appPort = app.listen(PORT, () => console.log(`Port currently running on ${PORT}`));
