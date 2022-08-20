@@ -7,7 +7,6 @@ import { WordsAppRequestBody, FoundUser } from '../utils/types';
 axios.defaults.headers.common['Authorization'] = process.env.AUTHORIZATION_CODE as string || '';
 
 async function addWords(req: express.Request, res: express.Response) {
-    // console.log('req obj ', req.isAccessible, req.userEmail, req.body);
     if (req.isAccessible && req.userEmail !== undefined) {
         const { englishWord, banglaWords, relatedEnglishWords } = req.body as WordsAppRequestBody;
 
@@ -21,8 +20,8 @@ async function addWords(req: express.Request, res: express.Response) {
                 } catch (err: any) {
                     throw new Error(err);
                 }
-            }).catch(() => {
-                res.status(500).send({ message: 'Internal Error on connect with User' });
+            }).catch((err) => {
+                res.status(500).send({ message: err.message });
             });
 
         } else res.status(404).send({ message: 'User needs to send required data' });

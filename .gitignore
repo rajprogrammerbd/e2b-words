@@ -109,3 +109,4 @@ dist
 coverage
 .vscode
 newrelic_agent.log
+.vs
