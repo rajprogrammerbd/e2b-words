@@ -1,14 +1,14 @@
 ﻿require('dotenv').config();
 import express from 'express';
 import wordServices from '../services/words.services';
-import axios, { AxiosResponse } from 'axios';
-import { WordsAppRequestBody, FoundUser } from '../utils/types';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import { WordsAddRequestBody, FoundUser, WordsRemoveRequestBody, ACCESS_TYPE } from '../utils/types';
 
 axios.defaults.headers.common['Authorization'] = process.env.AUTHORIZATION_CODE as string || '';
 
 async function addWords(req: express.Request, res: express.Response) {
     if (req.isAccessible && req.userEmail !== undefined) {
-        const { englishWord, banglaWords, relatedEnglishWords } = req.body as WordsAppRequestBody;
+        const { englishWord, banglaWords, relatedEnglishWords } = req.body as WordsAddRequestBody;
 
         if (englishWord !== undefined && banglaWords !== undefined && relatedEnglishWords !== undefined) {
 
@@ -29,6 +29,30 @@ async function addWords(req: express.Request, res: express.Response) {
     } else res.status(401).send({ message: "User needs to be authenticated" });
 }
 
+async function removeWords(req: express.Request, res: express.Response) {
+    if (req.isAccessible && req.userEmail !== undefined) {
+        const { englishWord } = req.body as WordsRemoveRequestBody;
+        if (englishWord !== undefined) {
+
+            await axios.post(`${process.env.USER_REPO_ACCESS_URL}/auth/find`, { email: req.userEmail }).then(async (user: AxiosResponse) => {
+                const { AccessType } = user.data;
+
+                try {
+                    res.json(await wordServices.removeWord(AccessType, englishWord));
+                } catch (err: any) {
+                    res.status(500).send(err);
+                }
+
+            }).catch((err: AxiosError) => {
+                res.status(500).send(err);
+            });
+
+        } else res.status(404).send({ message: 'User needs to send required data' });
+
+    } else res.status(401).send({ message: "User needs to be authenticated" });
+}
+
 export default {
     addWords,
+    removeWords
 };
