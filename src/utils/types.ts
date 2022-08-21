@@ -1,7 +1,13 @@
-export interface WordsAppRequestBody {
+export type ACCESS_TYPE = 'Admin' | 'User' | 'Temp';
+
+export interface WordsAddRequestBody {
     englishWord: string;
     banglaWords: string[];
     relatedEnglishWords: string[];
+}
+
+export interface WordsRemoveRequestBody {
+    englishWord: string;
 }
 
 export interface AddWordResponseType {
