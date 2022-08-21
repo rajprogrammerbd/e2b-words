@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
-import { faker } from '@faker-js/faker';
 import request from 'supertest';
+import supertest from 'supertest';
 import appPort from '../../index';
 import { Words } from '../services/words.services';
+require('dotenv').config();
 
 const URL = process.env.MONGODB_ACCESS_URL as string;
 
@@ -24,25 +25,23 @@ afterEach((done) => {
     });
 });
 
-const defaultAgent = new Proxy(request(appPort), {
-    get: (target, name) => (...args: any[]) =>
-      (target as any)[name](...args).set({
-        'Authorization': process.env.AUTHORIZATION_CODE as string,
-        'Cookie': 'LOGIN_ACCESS_COOKIE=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJkMjI0OTYxOUBnbWFpbC5jb20iLCJpZCI6IjYyZmYyNmExZTYwNGViOWI1MTE5MDQ5MSIsImlhdCI6MTY2MDk3OTA5MiwiZXhwIjoxNjYxMDY1NDkyfQ.13pteQtCOCFzGufkQAZnuawEUBAFHfnRqrmYlWksPDc'
-    })
-});
+test('Test e2b integration test', async () => {
+    const customAgent = new Proxy(supertest(appPort), {
+      get: (target, name) => (...args: any[]) =>
+       (target as any)[name](...args).set({
+         'Authorization': process.env.AUTHORIZATION_CODE as string,
+         'Cookie': `LOGIN_ACCESS_COOKIE=${process.env.COOKIES as string}`,
+       })
+   });
 
-test('GET - / - Success to retrieve homepage endpoint', async () => {
-    const res = await defaultAgent.get('/');
+   const res = await customAgent.get('/');
 
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toEqual({ message: 'Hello' });
-});
+   expect(res.statusCode).toBe(200);
+   expect(res.body).toEqual({ message: 'Hello' });
 
-test('POST - /api/add/word', async () => {
-    const mockAgent = new Proxy(request(appPort), {
+   const mockAgent = new Proxy(request(appPort), {
         get: (target, name) => (...args: any[]) =>
-          (target as any)[name](...args).set({
+        (target as any)[name](...args).set({
             'Authorization': process.env.AUTHORIZATION_CODE as string,
         })
     });
@@ -58,7 +57,7 @@ test('POST - /api/add/word', async () => {
     expect(userNeedLogin.statusCode).toBe(401);
     expect(userNeedLogin.body).toEqual({ message: 'User needs to login' });
 
-    const addWord = await defaultAgent.post('/api/add/word').send(body);
+    const addWord = await customAgent.post('/api/add/word').send(body);
 
     expect(addWord.statusCode).toBe(200);
     expect(addWord.body).toEqual({
@@ -70,19 +69,54 @@ test('POST - /api/add/word', async () => {
         }
     });
 
-    const reAddWord = await defaultAgent.post('/api/add/word').send(body);
+    const reAddWord = await customAgent.post('/api/add/word').send(body);
 
     expect(reAddWord.statusCode).toBe(500);
     expect(reAddWord.body).toEqual({
         message: 'Word already existed'
     });
 
-    const missingData = await defaultAgent.post('/api/add/word').send({});
+    const missingData = await customAgent.post('/api/add/word').send({});
     
     expect(missingData.statusCode).toBe(404);
     expect(missingData.body).toEqual({
         message: 'User needs to send required data'
     });
-
     await Words.remove({ englishWord: body.englishWord });
-}, 10000);
+}, 20000);
+
+test('DELETE - /api/add/word', async () => {
+    const body = {
+        englishWord: "demoWords",
+        banglaWords: ["শৈশব"],
+        relatedEnglishWords: ["infancy", "babyhood"]
+    };
+
+    const customAgent = new Proxy(supertest(appPort), {
+        get: (target, name) => (...args: any[]) =>
+         (target as any)[name](...args).set({
+           'Authorization': process.env.AUTHORIZATION_CODE as string,
+           'Cookie': `LOGIN_ACCESS_COOKIE=${process.env.COOKIES as string}`,
+         })
+     });
+
+     const successCase = await customAgent.post('/api/add/word').send(body);
+
+     expect(successCase.statusCode).toBe(200);
+     expect(successCase.body).toEqual({
+         ...body,
+         user: {
+             email: "rd2249619@gmail.com",
+             username: "rajprogrammerbd",
+             accessType: "Admin"
+         }
+     });
+
+     const deleted = await customAgent.delete('/api/remove/word').send({ englishWord: "demoWords" });
+     expect(deleted.statusCode).toBe(200);
+     expect(deleted.body).toEqual({
+        status: true
+     });
+
+     await Words.deleteOne({ englishWord: body.englishWord });
+});
