@@ -27,7 +27,7 @@ export interface AddWordErrorResponse {
 
 export interface FoundUser {
     name: string;
-    email: string;
+    userEmail: string;
     userName: string;
     AccessType: string;
 }

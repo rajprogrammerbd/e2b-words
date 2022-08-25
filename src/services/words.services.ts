@@ -10,7 +10,7 @@ export const Words = Database.prepare(wordsSchema, 'words');
 function addWord(object: WordsAddRequestBody, user: FoundUser): Promise<AddWordResponseType | AddWordErrorResponse> {
     return new Promise(async (resolve, reject) => {
         const { englishWord, banglaWords, relatedEnglishWords } = object;
-        const { email, userName, AccessType } = user;
+        const { userEmail, userName, AccessType } = user;
     
         try {
             await Words.find({ englishWord }).then(async (findWord: any) => {
@@ -20,7 +20,7 @@ function addWord(object: WordsAddRequestBody, user: FoundUser): Promise<AddWordR
                         banglaWords,
                         relatedEnglishWords,
                         user: {
-                            email,
+                            email: userEmail,
                             username: userName,
                             accessType: AccessType,
                         }

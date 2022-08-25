@@ -2,7 +2,7 @@
 import express from 'express';
 import wordServices from '../services/words.services';
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { WordsAddRequestBody, FoundUser, WordsRemoveRequestBody, ACCESS_TYPE } from '../utils/types';
+import { WordsAddRequestBody, FoundUser, WordsRemoveRequestBody } from '../utils/types';
 
 axios.defaults.headers.common['Authorization'] = process.env.AUTHORIZATION_CODE as string || '';
 
@@ -11,7 +11,6 @@ async function addWords(req: express.Request, res: express.Response) {
         const { englishWord, banglaWords, relatedEnglishWords } = req.body as WordsAddRequestBody;
 
         if (englishWord !== undefined && banglaWords !== undefined && relatedEnglishWords !== undefined) {
-
             const object: any = { englishWord, banglaWords, relatedEnglishWords };
 
             await axios.post(`${process.env.USER_REPO_ACCESS_URL}/auth/find`, { email: req.userEmail }).then(async (user: AxiosResponse) => {
