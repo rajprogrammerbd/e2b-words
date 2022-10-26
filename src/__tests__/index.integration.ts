@@ -1,9 +1,9 @@
+require('dotenv').config();
 import mongoose from 'mongoose';
 import request from 'supertest';
 import supertest from 'supertest';
 import appPort from '../../index';
 import { Words } from '../services/words.services';
-require('dotenv').config();
 
 const URL = process.env.MONGODB_ACCESS_URL as string;
 
