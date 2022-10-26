@@ -8,7 +8,7 @@
     "postinstall": "tsc",
     "watch-node": "node -r newrelic dist/index.js",
     "watch-ts": "nodemon -r newrelic index.ts",
-    "test": "jest --coverage  --forceExit --detectOpenHandles --verbose",
+    "test": "jest ./dist --coverage  --forceExit --detectOpenHandles --verbose",
     "watchAll": "jest --coverage --watchAll --detectOpenHandles"
   },
   "repository": {
