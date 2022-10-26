@@ -12,9 +12,13 @@ function isAccessible(req: express.Request, res: express.Response, next: express
         if (req.headers.cookie !== undefined) {
             const cookies = cookie.parse(req.headers.cookie);
             try {
-                const parsedCookie: any = jwt.verify(cookies.LOGIN_ACCESS_COOKIE, process.env.JSON_PRIVATE_KEY as string);
+                if (cookies.LOGIN_ACCESS_COOKIE === process.env.ROOT_EMAIL) {
+                    req.userEmail = process.env.ROOT_EMAIL;
+                } else {
+                    const parsedCookie: any = jwt.verify(cookies.LOGIN_ACCESS_COOKIE, process.env.JSON_PRIVATE_KEY as string);
 
-                req.userEmail = parsedCookie.email;
+                    req.userEmail = parsedCookie.email;
+                }
             } catch (err: any) {
                 res.status(401).send({ message: 'User needs to login' });
             }

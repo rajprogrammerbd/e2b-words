@@ -21,6 +21,7 @@ jobs:
       JSON_PRIVATE_KEY: ${{ secrets.JSON_PRIVATE_KEY }}
       USER_REPO_ACCESS_URL: ${{ secrets.USER_REPO_ACCESS_URL }}
       COOKIES: ${{ secrets.COOKIES }}
+      ROOT_EMAIL: ${{ secrets.ROOT_EMAIL }}
 
     strategy:
       matrix:
@@ -48,6 +49,7 @@ jobs:
       JSON_PRIVATE_KEY: ${{ secrets.JSON_PRIVATE_KEY }}
       USER_REPO_ACCESS_URL: ${{ secrets.USER_REPO_ACCESS_URL }}
       COOKIES: ${{ secrets.COOKIES }}
+      ROOT_EMAIL: ${{ secrets.ROOT_EMAIL }}
 
     steps:
       - uses: actions/checkout@v2
