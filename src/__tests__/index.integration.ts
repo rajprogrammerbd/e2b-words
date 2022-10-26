@@ -58,7 +58,7 @@ test('Test e2b integration test', async () => {
     expect(userNeedLogin.body).toEqual({ message: 'User needs to login' });
 
     const addWord = await customAgent.post('/api/add/word').send(body);
-
+    console.log('response', addWord.body);
     expect(addWord.statusCode).toBe(200);
     expect(addWord.body).toEqual({
         ...body,
