@@ -20,6 +20,7 @@ async function addWords(req: express.Request, res: express.Response) {
                     throw new Error(err);
                 }
             }).catch((err) => {
+                console.log('this error occured');
                 res.status(500).send({ message: err.message });
             });
 

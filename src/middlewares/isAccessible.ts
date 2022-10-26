@@ -11,7 +11,7 @@ function isAccessible(req: express.Request, res: express.Response, next: express
     if (isConnected) {
         if (req.headers.cookie !== undefined) {
             const cookies = cookie.parse(req.headers.cookie);
-            console.log('found cookie', cookies);
+            
             try {
                 if (cookies.LOGIN_ACCESS_COOKIE === process.env.ROOT_EMAIL) {
                     req.userEmail = process.env.ROOT_EMAIL;
