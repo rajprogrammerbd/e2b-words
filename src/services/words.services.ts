@@ -43,7 +43,6 @@ function addWord(object: WordsAddRequestBody, user: FoundUser): Promise<AddWordR
     
     
         } catch (err) {
-            console.log('unfortunate error appeared ', err);
             logger.error(err);
             reject(err);
         }
