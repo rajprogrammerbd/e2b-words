@@ -1,7 +1,7 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Express JS CLI
+name: Build and test
 
 on:
   push:
@@ -10,8 +10,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  Test:
     runs-on: ubuntu-latest
     env:
       MONGODB_ACCESS_URL: ${{ secrets.MONGODB_ACCESS_URL }}
@@ -22,6 +21,7 @@ jobs:
       JSON_PRIVATE_KEY: ${{ secrets.JSON_PRIVATE_KEY }}
       USER_REPO_ACCESS_URL: ${{ secrets.USER_REPO_ACCESS_URL }}
       COOKIES: ${{ secrets.COOKIES }}
+      ROOT_EMAIL: ${{ secrets.ROOT_EMAIL }}
 
     strategy:
       matrix:
@@ -35,3 +35,32 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm install
     - run: npm run test
+
+  sonarcloud:
+    needs: Test
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    env:
+      MONGODB_ACCESS_URL: ${{ secrets.MONGODB_ACCESS_URL }}
+      PORT: ${{ secrets.PORT }}
+      NEW_RELIC_APP_NAME: ${{ secrets.NEW_RELIC_APP_NAME }}
+      NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+      AUTHORIZATION_CODE: ${{ secrets.AUTHORIZATION_CODE }}
+      JSON_PRIVATE_KEY: ${{ secrets.JSON_PRIVATE_KEY }}
+      USER_REPO_ACCESS_URL: ${{ secrets.USER_REPO_ACCESS_URL }}
+      COOKIES: ${{ secrets.COOKIES }}
+      ROOT_EMAIL: ${{ secrets.ROOT_EMAIL }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 
+      - name: Install dependencies
+        run: yarn
+      - name: Test and coverage
+        run: npm run test
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

@@ -1,9 +1,9 @@
+require('dotenv').config();
 import mongoose from 'mongoose';
 import request from 'supertest';
 import supertest from 'supertest';
 import appPort from '../../index';
 import { Words } from '../services/words.services';
-require('dotenv').config();
 
 const URL = process.env.MONGODB_ACCESS_URL as string;
 
@@ -30,7 +30,7 @@ test('Test e2b integration test', async () => {
       get: (target, name) => (...args: any[]) =>
        (target as any)[name](...args).set({
          'Authorization': process.env.AUTHORIZATION_CODE as string,
-         'Cookie': `LOGIN_ACCESS_COOKIE=${process.env.COOKIES as string}`,
+         'Cookie': `LOGIN_ACCESS_COOKIE=${process.env.ROOT_EMAIL as string}`,
        })
    });
 
